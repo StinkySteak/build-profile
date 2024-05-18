@@ -1,0 +1,12 @@
+{
+  "name": "com.stinkysteak.build-pipeline",
+  "version": "0.1.0",
+  "displayName": "Build Pipeline",
+  "description": "Allow you to build multiple build multiple platforms configurations in one click",
+  "unity": "2021.3",
+  "author": {
+    "name": "Stinkysteak",
+    "email": "stinkysteak@steaksoft.com",
+    "url": "https://steaksoft.net"
+  }
+}
