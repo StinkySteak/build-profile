@@ -9,9 +9,9 @@ using StinkySteak.PipelineBuilder.Data;
 
 namespace StinkySteak.PipelineBuilder
 {
-    public class BuildConfigPipelineBuilder
+    public class BaseBuildConfigPipelineBuilder
     {
-        public void BuildConfig(BuildConfig config)
+        public void BuildConfig(BaseBuildConfig config)
         {
             BuildTargetGroup buildTarget = config.BuildTargetGroup;
 
@@ -52,7 +52,7 @@ namespace StinkySteak.PipelineBuilder
 
             BuildPipeline.BuildPlayer(buildOptions);
 
-            Debug.Log($"[{nameof(BuildConfigPipelineBuilder)}]: Game build available in: {finalPath}");
+            Debug.Log($"[{nameof(BaseBuildConfigPipelineBuilder)}]: Game build available in: {finalPath}");
 
 #if !UNITY_2022_2_OR_NEWER
             // Re-apply old scripting definition
@@ -60,17 +60,17 @@ namespace StinkySteak.PipelineBuilder
 #endif
         }
 
-        public virtual void PreProcessScriptingSymbols(BuildConfig buildConfig, in List<string> symbols)
+        public virtual void PreProcessScriptingSymbols(BaseBuildConfig buildConfig, in List<string> symbols)
         {
             throw new NotImplementedException();
         }
 
-        public virtual string GetLocationPath(BuildConfig config)
+        public virtual string GetLocationPath(BaseBuildConfig config)
         {
             throw new NotImplementedException();
         }
 
-        public virtual void PrintConfig(BuildConfig config)
+        public virtual void PrintConfig(BaseBuildConfig config)
         {
             StringBuilder stringBuilder = new();
 
@@ -80,9 +80,9 @@ namespace StinkySteak.PipelineBuilder
                 stringBuilder.Append($"{item};");
 
             if (symbols.Count > 0)
-                Debug.Log($"[{nameof(BuildConfigPipelineBuilder)}]: Building config ({config.FolderName}) with: {stringBuilder}");
+                Debug.Log($"[{nameof(BaseBuildConfigPipelineBuilder)}]: Building config ({config.FolderName}) with: {stringBuilder}");
             else
-                Debug.Log($"[{nameof(BuildConfigPipelineBuilder)}]: Building config ({config.FolderName}) with no symbols");
+                Debug.Log($"[{nameof(BaseBuildConfigPipelineBuilder)}]: Building config ({config.FolderName}) with no symbols");
         }
 
         protected virtual string GetFileExtension(BuildTarget buildTarget)
@@ -93,7 +93,7 @@ namespace StinkySteak.PipelineBuilder
                 return string.Empty; //Directory
             else if (buildTarget == BuildTarget.StandaloneLinux64 || buildTarget == BuildTarget.LinuxHeadlessSimulation)
                 return ".x86_64";
-            Debug.LogError($"[{nameof(BuildConfigPipelineBuilder)}]: No file extension supported for: {buildTarget}");
+            Debug.LogError($"[{nameof(BaseBuildConfigPipelineBuilder)}]: No file extension supported for: {buildTarget}");
 
             return string.Empty;
         }

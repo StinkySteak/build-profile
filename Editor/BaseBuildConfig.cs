@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace StinkySteak.PipelineBuilder.Data
 {
-    public class BuildConfig : ScriptableObject
+    public class BaseBuildConfig : ScriptableObject
     {
         [SerializeField] protected string _folderName;
         [SerializeField] protected BuildTargetGroup _buildTargetGroup;
@@ -66,7 +66,7 @@ namespace StinkySteak.PipelineBuilder.Data
 
             StringBuilder sb = new();
 
-            sb.AppendLine($"[{nameof(BuildConfig)}]: Registered scenes:");
+            sb.AppendLine($"[{nameof(BaseBuildConfig)}]: Registered scenes:");
             for (int i = 0; i < scenes.Length; i++)
             {
                 sb.AppendLine($"Scene: ({scenes[i].name}) Path: {paths[i]}");

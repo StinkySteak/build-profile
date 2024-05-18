@@ -8,19 +8,19 @@ using Debug = UnityEngine.Debug;
 
 namespace StinkySteak.PipelineBuilder.Window
 {
-    public class PipelineBuilderWindow : EditorWindow
+    public class BasePipelineBuilderWindow : EditorWindow
     {
-        [SerializeField] protected BuildConfigContainer _configContainer;
-        [SerializeField] protected BuildConfig _singleConfig;
-        private BuildConfigPipelineBuilder _builder;
+        [SerializeField] protected BaseBuildConfigContainer _configContainer;
+        [SerializeField] protected BaseBuildConfig _singleConfig;
+        private BaseBuildConfigPipelineBuilder _builder;
         private const string FILE_EXPLORER = "explorer.exe";
 
-        public PipelineBuilderWindow()
+        public BasePipelineBuilderWindow()
         {
-            _builder = new BuildConfigPipelineBuilder();
+            _builder = new BaseBuildConfigPipelineBuilder();
         }
 
-        protected virtual BuildConfigPipelineBuilder GetBuilder()
+        protected virtual BaseBuildConfigPipelineBuilder GetBuilder()
         {
             throw new NotImplementedException();
         }
@@ -31,13 +31,13 @@ namespace StinkySteak.PipelineBuilder.Window
             GUILayout.Label("Build All", GetHeadingStyle());
             GUILayout.Label("Config Container");
 
-            _configContainer = (BuildConfigContainer)EditorGUILayout.ObjectField(_configContainer, typeof(BuildConfigContainer), false);
+            _configContainer = (BaseBuildConfigContainer)EditorGUILayout.ObjectField(_configContainer, typeof(BaseBuildConfigContainer), false);
 
             if (GUILayout.Button("Build All Configs"))
             {
-                Debug.Log($"[{nameof(PipelineBuilderWindow)}]: Detected {_configContainer.Configs.Count} Configs. Building...");
+                Debug.Log($"[{nameof(BasePipelineBuilderWindow)}]: Detected {_configContainer.Configs.Count} Configs. Building...");
 
-                foreach (BuildConfig config in _configContainer.Configs)
+                foreach (BaseBuildConfig config in _configContainer.Configs)
                     _builder.BuildConfig(config);
             }
 
@@ -46,11 +46,11 @@ namespace StinkySteak.PipelineBuilder.Window
             GUILayout.Label("Build Single", GetHeadingStyle());
             GUILayout.Label("Selected Config");
 
-            _singleConfig = (BuildConfig)EditorGUILayout.ObjectField(_singleConfig, typeof(BuildConfig), false);
+            _singleConfig = (BaseBuildConfig)EditorGUILayout.ObjectField(_singleConfig, typeof(BaseBuildConfig), false);
 
             if (GUILayout.Button("Build Single Config Only"))
             {
-                Debug.Log($"[{nameof(PipelineBuilderWindow)}]: Building a single config: ({_singleConfig.name}). Building...");
+                Debug.Log($"[{nameof(BasePipelineBuilderWindow)}]: Building a single config: ({_singleConfig.name}). Building...");
 
                 _builder.BuildConfig(_singleConfig);
             }
