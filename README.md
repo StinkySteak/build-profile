@@ -1,6 +1,10 @@
 # Unity Build Pipeline
 This plugin allow you to build multiple platforms configurations in one click. Recommended for building cross-platform application.
 
+## Unity Editor Version Compatiblity
+- Unity 6 has a similar feature called [Build Profile](https://docs.unity3d.com/6000.0/Documentation/Manual/build-profiles.html)
+- Some unity editor has [Known Issues](https://github.com/StinkySteak/builder-pipeline/edit/master/README.md#known-issues)
+
 ## How to Use?
 1. Create a class Inherit `BaseBuildConfig`
   - Override `GetDefaultPath()`
