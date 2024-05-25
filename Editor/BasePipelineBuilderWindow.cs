@@ -17,7 +17,7 @@ namespace StinkySteak.PipelineBuilder.Window
 
         public BasePipelineBuilderWindow()
         {
-            _builder = new BaseBuildConfigPipelineBuilder();
+            _builder = GetBuilder();
         }
 
         protected virtual BaseBuildConfigPipelineBuilder GetBuilder()
