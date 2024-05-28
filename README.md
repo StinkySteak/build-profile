@@ -92,8 +92,3 @@ public class PipelineBuilderWindow : BasePipelineBuilderWindow
 - This issue is persist in 2021.3.21 - 23. 
 - **No Workaround Available**
 - [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/buildpipeline-dot-buildplayer-ignores-buildplayeroptions-dot-locationpathname-and-attempts-to-build-to-the-cached-folder)
-
-### Extra Scripting Defines not working
-- This issue is persist in 2021.3.21
-- **Workaround**: Apply scripting define symbols using `PlayerSettings` API Instead.
-- [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/android-dll-with-define-constraint-included-in-buildplayeroptions-dot-extrascriptingdefines-is-not-included-in-build)
