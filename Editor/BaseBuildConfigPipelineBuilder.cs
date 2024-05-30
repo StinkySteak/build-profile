@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using System;
 using StinkySteak.PipelineBuilder.Data;
+using System.Reflection;
 
 namespace StinkySteak.PipelineBuilder
 {
@@ -13,6 +14,10 @@ namespace StinkySteak.PipelineBuilder
     {
         public void BuildConfig(BaseBuildConfig config)
         {
+            BuildTarget previousTarget = EditorUserBuildSettings.activeBuildTarget;
+            BuildTargetGroup previousTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+            int subTarget = GetActiveSubtargetFor(previousTarget);
+
             BuildTargetGroup buildTarget = config.BuildTargetGroup;
 
             PlayerSettings.SetScriptingBackend(buildTarget, config.ScriptingImplementation);
@@ -58,6 +63,25 @@ namespace StinkySteak.PipelineBuilder
             // Re-apply old scripting definition
             PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, temp);
 #endif
+            SwitchActiveBuildTargetAndSubtargetNoCheck(previousTargetGroup, previousTarget, subTarget);
+        private static int GetActiveSubtargetFor(BuildTarget target)
+        {
+            Type type = typeof(EditorUserBuildSettings);
+
+            MethodInfo methodInfo = type.GetMethod("GetActiveSubtargetFor", BindingFlags.Static | BindingFlags.NonPublic);
+
+            int subTarget = (int)methodInfo.Invoke(null, new object[] { target });
+
+            return subTarget;
+        }
+
+        private static void SwitchActiveBuildTargetAndSubtargetNoCheck(BuildTargetGroup targetGroup, BuildTarget target, int subtarget)
+        {
+            Type type = typeof(EditorUserBuildSettings);
+
+            MethodInfo methodInfo = type.GetMethod("SwitchActiveBuildTargetAndSubtargetNoCheck", BindingFlags.Static | BindingFlags.NonPublic);
+
+            methodInfo.Invoke(null, new object[] { targetGroup, target , subtarget });
         }
 
         public virtual void PreProcessScriptingSymbols(BaseBuildConfig buildConfig, in List<string> symbols)
