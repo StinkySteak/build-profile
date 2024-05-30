@@ -49,21 +49,20 @@ namespace StinkySteak.PipelineBuilder
             };
 
             string[] temp = symbols;
-#if !UNITY_2022_2_OR_NEWER
-            // Unity Pre 2022 Fix. Apply scripting symbols for this config
+
             PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, symbolList.ToArray());
-#endif
             PrintConfig(config);
 
             BuildPipeline.BuildPlayer(buildOptions);
 
             Debug.Log($"[{nameof(BaseBuildConfigPipelineBuilder)}]: Game build available in: {finalPath}");
 
-#if !UNITY_2022_2_OR_NEWER
-            // Re-apply old scripting definition
             PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, temp);
-#endif
+
             SwitchActiveBuildTargetAndSubtargetNoCheck(previousTargetGroup, previousTarget, subTarget);
+
+        }
+
         private static int GetActiveSubtargetFor(BuildTarget target)
         {
             Type type = typeof(EditorUserBuildSettings);
