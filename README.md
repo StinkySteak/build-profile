@@ -19,9 +19,6 @@ This plugin allow you to build multiple platforms configurations in one click. R
 ```cs
 public class BuildConfig : BaseBuildConfig
 {
-    [SerializeField] protected BuildEnvironment _environment;
-    public BuildEnvironment Environment => _environment;
-
     public override string GetDefaultPath()
     {
         return new DirectoryInfo(Application.dataPath).Parent.Parent.Parent.FullName;
