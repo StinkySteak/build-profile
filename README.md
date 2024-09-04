@@ -70,7 +70,7 @@ public class PipelineBuilderWindow : BasePipelineBuilderWindow
 
     protected override BaseBuildConfigPipelineBuilder GetBuilder()
     {
-        return new BuildConfigPipelineBuilder2();
+        return new BuildConfigPipelineBuilder();
     }
 }
 ```
