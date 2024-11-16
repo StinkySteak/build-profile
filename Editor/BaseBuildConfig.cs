@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace StinkySteak.PipelineBuilder.Data

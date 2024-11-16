@@ -7,27 +7,31 @@ using UnityEngine;
 using System;
 using StinkySteak.PipelineBuilder.Data;
 using System.Reflection;
+using UnityEditor.Build;
 
 namespace StinkySteak.PipelineBuilder
 {
     public class BaseBuildConfigPipelineBuilder
     {
+        internal struct PlatformProperty
+        {
+            public BuildTarget BuildTarget;
+            public BuildTargetGroup BuildTargetGroup;
+            public StandaloneBuildSubtarget StandaloneBuildSubtarget;
+            public NamedBuildTarget NamedBuildTarget;
+        }
+
         public void BuildConfig(BaseBuildConfig config)
         {
-            BuildTarget previousTarget = EditorUserBuildSettings.activeBuildTarget;
-            BuildTargetGroup previousTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
-            int subTarget = GetActiveSubtargetFor(previousTarget);
+            PlatformProperty previousPlatform = GetCurrentPlatformProperty();
+            PlatformProperty targetedPlatform = GetTargetedPlatformProperty(config);
 
-            BuildTargetGroup buildTarget = config.BuildTargetGroup;
 
-            PlayerSettings.SetScriptingBackend(buildTarget, config.ScriptingImplementation);
-
-            if (config.GetStandaloneSubTarget() == StandaloneBuildSubtarget.Server)
-                PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Server, config.ScriptingImplementation);
-
-            PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget, out string[] symbols);
+            PlayerSettings.SetScriptingBackend(targetedPlatform.NamedBuildTarget, config.ScriptingImplementation);
+            PlayerSettings.GetScriptingDefineSymbols(targetedPlatform.NamedBuildTarget, out string[] symbols);
 
             List<string> symbolList = symbols.ToList();
+            string[] previousSymbols = symbols;
 
             PreProcessScriptingSymbols(config, symbolList);
 
@@ -41,26 +45,51 @@ namespace StinkySteak.PipelineBuilder
                 locationPathName = finalPath, // Specify build output path
                 target = config.BuildTarget,
                 options = config.BuildOptions,
-
-                //Not working on Unity 2021, fixed on Unity 2022
-                extraScriptingDefines = symbolList.ToArray(),
                 subtarget = (int)config.GetStandaloneSubTarget(),
-                targetGroup = buildTarget,
+                targetGroup = targetedPlatform.BuildTargetGroup,
             };
 
-            string[] temp = symbols;
-
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, symbolList.ToArray());
-            PrintConfig(config);
+            PlayerSettings.SetScriptingDefineSymbols(targetedPlatform.NamedBuildTarget, symbolList.ToArray());
+            PrintSymbols(config, symbolList);
 
             BuildPipeline.BuildPlayer(buildOptions);
 
             Debug.Log($"[{nameof(BaseBuildConfigPipelineBuilder)}]: Game build available in: {finalPath}");
 
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, temp);
+            PlayerSettings.SetScriptingDefineSymbols(targetedPlatform.NamedBuildTarget, previousSymbols);
 
-            SwitchActiveBuildTargetAndSubtargetNoCheck(previousTargetGroup, previousTarget, subTarget);
+            SwitchActiveBuildTargetAndSubtargetNoCheck(previousPlatform.BuildTargetGroup, previousPlatform.BuildTarget, (int)previousPlatform.StandaloneBuildSubtarget);
+        }
 
+        private PlatformProperty GetTargetedPlatformProperty(BaseBuildConfig config)
+        {
+            BuildTarget target = config.BuildTarget;
+            BuildTargetGroup buildTargetGroup = config.BuildTargetGroup;
+            StandaloneBuildSubtarget subTarget = config.GetStandaloneSubTarget();
+            NamedBuildTarget namedBuildTarget = GetNamedBuildTarget(config.BuildTargetGroup, config.GetStandaloneSubTarget());
+
+            PlatformProperty prop;
+            prop.BuildTarget = config.BuildTarget;
+            prop.BuildTargetGroup = buildTargetGroup;
+            prop.NamedBuildTarget = namedBuildTarget;
+            prop.StandaloneBuildSubtarget = config.GetStandaloneSubTarget();
+
+            return prop;
+        }
+        private PlatformProperty GetCurrentPlatformProperty()
+        {
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+            StandaloneBuildSubtarget subTarget = (StandaloneBuildSubtarget)GetActiveSubtargetFor(target);
+            NamedBuildTarget namedBuildTarget = GetNamedBuildTarget(buildTargetGroup, subTarget);
+
+            PlatformProperty prop;
+            prop.BuildTarget = target;
+            prop.BuildTargetGroup = buildTargetGroup;
+            prop.NamedBuildTarget = namedBuildTarget;
+            prop.StandaloneBuildSubtarget = subTarget;
+
+            return prop;
         }
 
         private static int GetActiveSubtargetFor(BuildTarget target)
@@ -80,7 +109,7 @@ namespace StinkySteak.PipelineBuilder
 
             MethodInfo methodInfo = type.GetMethod("SwitchActiveBuildTargetAndSubtargetNoCheck", BindingFlags.Static | BindingFlags.NonPublic);
 
-            methodInfo.Invoke(null, new object[] { targetGroup, target , subtarget });
+            methodInfo.Invoke(null, new object[] { targetGroup, target, subtarget });
         }
 
         public virtual void PreProcessScriptingSymbols(BaseBuildConfig buildConfig, in List<string> symbols)
@@ -93,11 +122,22 @@ namespace StinkySteak.PipelineBuilder
             throw new NotImplementedException();
         }
 
-        public virtual void PrintConfig(BaseBuildConfig config)
+        private NamedBuildTarget GetNamedBuildTarget(BuildTargetGroup buildTargetGroup, StandaloneBuildSubtarget subtarget)
+        {
+            bool isStandalone = buildTargetGroup == BuildTargetGroup.Standalone;
+            bool isServer = subtarget == StandaloneBuildSubtarget.Server;
+
+            if (isStandalone && isServer)
+            {
+                return NamedBuildTarget.Server;
+            }
+
+            return NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup);
+        }
+
+        public virtual void PrintSymbols(BaseBuildConfig config, List<string> symbols)
         {
             StringBuilder stringBuilder = new();
-
-            List<string> symbols = new();
 
             foreach (string item in symbols)
                 stringBuilder.Append($"{item};");
