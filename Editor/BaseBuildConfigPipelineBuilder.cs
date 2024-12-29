@@ -156,6 +156,9 @@ namespace StinkySteak.PipelineBuilder
                 return string.Empty; //Directory
             else if (buildTarget == BuildTarget.StandaloneLinux64 || buildTarget == BuildTarget.LinuxHeadlessSimulation)
                 return ".x86_64";
+            else if (buildTarget == BuildTarget.Android)
+                return ".apk";
+
             Debug.LogError($"[{nameof(BaseBuildConfigPipelineBuilder)}]: No file extension supported for: {buildTarget}");
 
             return string.Empty;
